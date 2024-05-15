@@ -28,7 +28,7 @@ export const Header = () => {
               <NavDropdown.Item href="#action/3.1">Create new Case</NavDropdown.Item>
             </NavDropdown>
             <NavDropdown title={userData.decodificado.userName} id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
+              <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.1">Log Out</NavDropdown.Item>
             </NavDropdown>
           </Nav>
