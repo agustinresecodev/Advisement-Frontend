@@ -40,3 +40,12 @@ export const deleteClientCall = async (id) => {
         return error.response;
     }
 }
+
+export const createClientCall = async (data) => {
+    try {
+        const response = await axios.post(`${baseURL}clients`, data);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}

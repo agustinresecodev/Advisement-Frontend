@@ -251,7 +251,7 @@ export const ClientList = () => {
               <Form.Label>Contact Person</Form.Label>
               <Form.Control
                 type="text"
-                name="contact"
+                name="contactName"
                 value={clientData.contactName}
                 placeholder="Contact Person"
                 onChange={handleModal}
