@@ -21,3 +21,18 @@ export const getSelfUser = async (token) => {
         return error.response;
     }
 }
+
+//edit self profile
+export const editSelfProfile = async (userData, token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.put(`${baseURL}users/profile`, userData, config);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
