@@ -1,23 +1,21 @@
-import { useEffect, useState } from 'react';
-import { getAllCases } from '../../services/caseCall';
+import { useEffect, useState } from "react";
+import { getAllCases, getCaseById } from "../../services/caseCall";
 import DataTable from "react-data-table-component";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 export const Cases = () => {
-    
-const [cases, setCases] = useState([]);
-const [filteredCases, setFilteredCases] = useState([]);
-const [caseData, setCaseData] = useState({});
+  const [cases, setCases] = useState([]);
+  const [filteredCases, setFilteredCases] = useState([]);
 
-useEffect(() => {
+  useEffect(() => {
     const getCases = async () => {
-        const response = await getAllCases();
-        setCases(response.data);
-        setFilteredCases(response.data);
-    }
+      const response = await getAllCases();
+      setCases(response.data);
+      setFilteredCases(response.data);
+    };
     getCases();
-    
-},[]
-)
+  }, []);
 
   //Headers de la tabla
   const headers = [
@@ -25,30 +23,33 @@ useEffect(() => {
       name: "ID",
       label: "ID",
       selector: (row) => row.id,
-      sortable: true,      
-    },{
-        name: "Client Name",
-        label: "Client Name",
-        selector: (row) => row.client.name,
-        sortable: true,      
-      },
+      sortable: true,
+    },
+    {
+      name: "Client Name",
+      label: "Client Name",
+      selector: (row) => row.client.name,
+      sortable: true,
+    },
     {
       name: "Description",
       label: "description",
       selector: (row) => row.description,
     },
     {
-        name: "Address",
-        label: "Address",
-        selector: (row) => row.client.address,
+      name: "Address",
+      label: "Address",
+      selector: (row) => row.client.address,
     },
     {
       name: "Status",
       label: "Status",
       selector: (row) => row.status,
-      cell: (row) => (<>
-            <span>{row.status===true?("Resolved"):("Pending")}</span>
-      </>),
+      cell: (row) => (
+        <>
+          <span>{row.status === true ? "Resolved" : "Pending"}</span>
+        </>
+      ),
       sortable: true,
     },
     {
@@ -61,21 +62,32 @@ useEffect(() => {
       name: "Options",
       cell: (row) => (
         <>
-        <button
+          <button
             type="button"
             className="btn btn-success"
-            onClick={() => {console.log("View "+row.id)}}
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fillRule="currentColor" className="bi bi-eye" viewBox="0 0 16 16">
-  <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-  <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-</svg>
-        </button>
+            onClick={() => {
+              handleSeeDetails(row.id);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fillRule="currentColor"
+              className="bi bi-eye"
+              viewBox="0 0 16 16"
+            >
+              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+              <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+            </svg>
+          </button>
 
           <button
             type="button"
             className="btn btn-primary"
-            onClick={() => {console.log("Edit")}}
+            onClick={() => {
+              console.log("Edit");
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +108,9 @@ useEffect(() => {
           <button
             type="button"
             className="btn btn-danger"
-            onClick={() => {console.log("Delete")}}
+            onClick={() => {
+              console.log("Delete");
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -126,24 +140,82 @@ useEffect(() => {
     setFilteredCases(filtered);
   };
 
-  
-    return (
-        <div className='container'>
-        <input type="text" placeholder='Filter By Client Name'onChange={handleChange} />
-        <div>
-            <h1>Cases</h1>
-            <DataTable
-                title="Cases"
-                columns={headers}
-                data={filteredCases}
-                pagination
-                highlightOnHover
-                responsive
-                striped
-            />
+  // Details Modal Functions
+  const [caseData, setCaseData] = useState({});
+  const [showDetails, setShowDetails] = useState(false);
+  const handleSeeDetailsClose = () => setShowDetails(false);
+  const handleSeeDetailsShow = () => setShowDetails(true);
+  const handleSeeDetails = async (id) => {
+    const response = await getCaseById(id);
+    setCaseData(response.data);
+    handleSeeDetailsShow();
+  };
 
-            
-        </div>
-        </div>
-    )
-}
+  return (
+    <div className="container">
+      <input
+        type="text"
+        placeholder="Filter By Client Name"
+        onChange={handleChange}
+      />
+      <div>
+        <h1>Cases</h1>
+        <DataTable
+          title="Cases"
+          columns={headers}
+          data={filteredCases}
+          pagination
+          highlightOnHover
+          responsive
+          striped
+        />
+        <Modal
+          size="lg"
+          show={showDetails}
+          onHide={handleSeeDetailsClose}
+          backdrop="static"
+          keyboard={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Case Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div>
+              <h5>Case Info</h5>
+              <p>Description: {caseData.description}</p>
+              <p>Status: {caseData.status === true ? "Resolved" : "Pending"}</p>
+              <p>Creation Date: {caseData.createdAt}</p>
+            </div>
+            <div>
+              <h5>Client Info</h5>
+              <p>Name: {caseData.client?.name}</p>
+              <p>Address: {caseData.client?.address}</p>
+              <p>Phone: {caseData.client?.phone}</p>
+              <p>Email: {caseData.client?.email}</p>
+              <p>Contact:{caseData.client?.contactName}</p>
+            </div>
+            <div>
+                <h5>Tech info</h5>
+                <p>
+                    Tech Name: {caseData.user?.name}
+                </p>
+                <p>
+                    Tech Email: {caseData.user?.email}
+                </p>
+                <p>
+                    Tech Phone: {caseData.user?.phone}
+                </p>
+
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleSeeDetailsClose}>
+              Close
+            </Button>
+            <Button variant="primary">Understood</Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    </div>
+  );
+};
