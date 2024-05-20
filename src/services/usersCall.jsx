@@ -36,3 +36,33 @@ export const editSelfProfile = async (userData, token) => {
         return error.response;
     }
 }
+
+//get user by id
+export const getUserById = async (id, token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.get(`${baseURL}users/${id}`, config);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+//get all techs
+export const getAllTechs = async (token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.get(`${baseURL}users/techs`, config);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}

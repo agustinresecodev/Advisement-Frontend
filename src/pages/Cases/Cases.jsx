@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
-import { getAllCases, getCaseById } from "../../services/caseCall";
+import { getAllCases, getCaseById,editCaseCall } from "../../services/caseCall";
+import { getAllClientsCall, getClientById } from "../../services/clientsCall";
 import DataTable from "react-data-table-component";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { CaseDetailsModal } from "../../components/CaseDetailsModal/CaseDetailsModal";
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
+import dayjs from "dayjs";
+import { DayPicker } from "react-day-picker";
+import { set } from "date-fns";
+import { getAllTechs, getUserById } from "../../services/usersCall";
+
 
 export const Cases = () => {
   const [cases, setCases] = useState([]);
@@ -86,7 +95,7 @@ export const Cases = () => {
             type="button"
             className="btn btn-primary"
             onClick={() => {
-              console.log("Edit");
+              handleSeeEdit(row.id);
             }}
           >
             <svg
@@ -151,6 +160,141 @@ export const Cases = () => {
     handleSeeDetailsShow();
   };
 
+  //Edit Modal Functions
+  const [showEdit, setShowEdit] = useState(false);
+  const handleEditClose = () => setShowEdit(false);
+  const handleEditShow = () => setShowEdit(true);
+  const handleSeeEdit = async (id) => {
+    const response = await getCaseById(id);
+    setCaseData(response.data);
+    handleEditShow();
+    getClients();
+    getTechs();
+  };
+  const handleEditModal = (e) => {
+    setCaseData({
+      ...caseData,
+      [e.target.name]: e.target.value,
+    });
+    console.log(caseData);
+  };
+
+  //Get Clients
+  const [clients, setClients] = useState([]);
+  const [filteredClients, setFilteredClients] = useState([]);
+  //Get all clients for the select
+  const getClients = async () => {
+    const response = await getAllClientsCall();
+    setClients(response.data);
+    setFilteredClients(response.data);
+  }
+  //Filter clients
+  const clientFilter = (e) => {
+    const filtered = clients.filter((client) =>
+      client.name.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setFilteredClients(filtered);
+  }
+  //set the client to the case
+  const [selectedClient, setSelectedClient] = useState(null);
+
+  
+  useEffect(() => {
+    if (selectedClient) {
+      setCaseData({
+        ...caseData,
+        client: selectedClient,
+      });
+    }
+  }, [selectedClient]);
+
+  //Get the client by id
+  const getClientsById = async (id) => {
+    const response = await getClientById(id);
+    setCaseData({
+      ...caseData,
+      client: response.data,
+    });
+  }
+
+  //Handler for the client select and change the client info
+  const handlerClientChange = (e) => {
+    setSelectedClient(e.target.value);
+    getClientsById(e.target.value);    
+  }
+
+  //Get the tech by id
+  const getTechById = async (id) => {
+    const response = await getUserById(id);
+    setCaseData({
+      ...caseData,
+      user: response.data,
+    });
+  }
+
+  //Filter the techs
+  const [techs, setTechs] = useState([]);
+  const [filteredTechs, setFilteredTechs] = useState([]);
+  
+  const techFilter = (e) => {
+    const filtered = techs.filter((tech) =>
+      tech.firstName.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setFilteredTechs(filtered);
+  }
+
+  //Set the tech to the case
+  const [selectedTech, setSelectedTech] = useState(null);
+
+  useEffect(() => {
+    if (selectedTech) {
+      setCaseData({
+        ...caseData,
+        user: selectedTech,
+      });
+    }
+  }, [selectedTech]);
+
+  //Handler for the tech select and change the tech info
+  const handlerTechChange = (e) => {
+    setSelectedTech(e.target.value);
+    getTechById(e.target.value);
+  }
+
+  //Get all techs for the select
+  const getTechs = async () => {
+    const response = await getAllTechs();
+    setTechs(response.data);
+    setFilteredTechs(response.data);
+    console.log(response.data);
+  }
+
+  //Edit Modal Functions
+  const editCase = async (id) => {
+    
+      const editedCase = {
+        description: caseData.description,
+        status: caseData.status,
+        initialDate: caseData.initialDate,
+        finalDate: caseData.finalDate,
+        clientId: caseData.client.id,
+        userId: caseData.user.id,
+      };
+      try {
+      const response = await editCaseCall(id, editedCase);
+      console.log(response);
+    }catch (error) {
+      console.log(error);
+    }
+    
+
+    
+
+  }
+  
+  
+
+
   return (
     <div className="container">
       <input
@@ -169,10 +313,19 @@ export const Cases = () => {
           responsive
           striped
         />
+
+        {/* Details Modal */}
+        <CaseDetailsModal
+          caseData={caseData}
+          showDetails={showDetails}
+          handleSeeDetailsClose={handleSeeDetailsClose}
+        />
+
+        {/*Edit Modal*/}
         <Modal
           size="lg"
-          show={showDetails}
-          onHide={handleSeeDetailsClose}
+          show={showEdit}
+          onHide={handleSeeEdit}
           backdrop="static"
           keyboard={false}
         >
@@ -182,9 +335,28 @@ export const Cases = () => {
           <Modal.Body>
             <div>
               <h5>Case Info</h5>
-              <p>Description: {caseData.description}</p>
-              <p>Status: {caseData.status === true ? "Resolved" : "Pending"}</p>
-              <p>Creation Date: {caseData.createdAt}</p>
+              <div>
+                <InputGroup>
+                  <InputGroup.Text>Description</InputGroup.Text>
+                  <Form.Control as="textarea" aria-label="With textarea" onChange={handleEditModal} name="description" value={caseData.description}/>
+                </InputGroup>
+              </div>
+              <p>Status</p>
+              <Form.Select aria-label="Status" onChange={handleEditModal} name="status">
+                <option>Open this select menu</option>
+                <option value="true">Completed</option>
+                <option value="false">Pending</option>
+              </Form.Select>
+
+              <h5>Client</h5>
+              <input type="text" onChange={clientFilter} name="name"/>
+              <select name="client.id" onChange={handlerClientChange}>
+                {filteredClients.map((client) => (
+                  <option value={client.id}>{client.name}</option>
+                ))}
+              </select>
+              
+
             </div>
             <div>
               <h5>Client Info</h5>
@@ -195,24 +367,32 @@ export const Cases = () => {
               <p>Contact:{caseData.client?.contactName}</p>
             </div>
             <div>
-                <h5>Tech info</h5>
-                <p>
-                    Tech Name: {caseData.user?.name}
-                </p>
-                <p>
-                    Tech Email: {caseData.user?.email}
-                </p>
-                <p>
-                    Tech Phone: {caseData.user?.phone}
-                </p>
-
+              <h5>Tech info</h5>
+              <input type="text" onChange={techFilter} name="name"/>
+              <select name="user.id" onChange={handlerTechChange}>
+                {filteredTechs.map((tech) => (
+                  <option value={tech.id}>{tech.firstName} {tech.lastName}</option>
+                ))}
+              </select>
+              <p>Tech Name: {caseData.user?.firstName} {caseData.user?.lastName}</p>
+              
+              <p>Tech Email: {caseData.user?.email}</p>
+              <p>Tech Phone: {caseData.user?.phone}</p>
             </div>
+            <div>
+            <h3>initialDate</h3>
+              <input type="date"  onChange={handleEditModal} name="initialDate" value={caseData.initialDate}/>
+            
+            <h3>finalDate</h3>
+              <input type="date"  onChange={handleEditModal} name="finalDate" value={caseData.finalDate}/>
+            </div>
+            
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleSeeDetailsClose}>
+            <Button variant="secondary" onClick={handleEditClose}>
               Close
             </Button>
-            <Button variant="primary">Understood</Button>
+            <Button variant="primary" onClick={()=>{editCase(caseData.id)}}>Edit Case</Button>
           </Modal.Footer>
         </Modal>
       </div>
