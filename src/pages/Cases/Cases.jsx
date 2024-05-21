@@ -14,9 +14,6 @@ import { getAllTechs, getUserById } from "../../services/usersCall";
 import { getUserData } from "../../components/Slicers/userSlicer";
 import { useSelector } from "react-redux";
 
-
-
-
 export const Cases = () => {
   //read the token from the store
  const userData = useSelector(getUserData);
@@ -289,7 +286,7 @@ export const Cases = () => {
       };
       try {
       const response = await editCaseCall(id, editedCase, userData.token);
-      console.log(response);
+      
     }catch (error) {
       console.log(error);
     }
