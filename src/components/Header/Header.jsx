@@ -3,11 +3,22 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useSelector } from "react-redux"
-import { getUserData } from "../../components/Slicers/userSlicer";
+import { getUserData, logout } from "../../components/Slicers/userSlicer";
+import { useNavigate } from 'react-router-dom';
 
 export const Header = () => {
 
+  //navigate function
+  const navigate = useNavigate();
+  
+  //read the user data from the store
   const userData = useSelector(getUserData);
+  
+  //logout function
+  const logoutUser = () => {
+    dispatch(logout())
+    navigate("/");
+  }
 
 
   
@@ -29,7 +40,7 @@ export const Header = () => {
             </NavDropdown>
             <NavDropdown title={userData.decodificado.userName} id="basic-nav-dropdown">
               <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.1">Log Out</NavDropdown.Item>
+              <NavDropdown.Item onClick={()=>logoutUser}>Log Out</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
