@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllCases, getCaseById,editCaseCall } from "../../services/caseCall";
+import { getAllCases, getCaseById,editCaseCall, deleteCaseCall } from "../../services/caseCall";
 import { getAllClientsCall, getClientById } from "../../services/clientsCall";
 import DataTable from "react-data-table-component";
 import Button from "react-bootstrap/Button";
@@ -13,6 +13,7 @@ import { set } from "date-fns";
 import { getAllTechs, getUserById } from "../../services/usersCall";
 import { getUserData } from "../../components/Slicers/userSlicer";
 import { useSelector } from "react-redux";
+import { EditCaseModal } from "../../components/EditCaseModal/EditCaseModal";
 
 export const Cases = () => {
   //read the token from the store
@@ -20,15 +21,20 @@ export const Cases = () => {
 
   const [cases, setCases] = useState([]);
   const [filteredCases, setFilteredCases] = useState([]);
+  const [flag, setFlag] = useState(false);
 
   useEffect(() => {
     const getCases = async () => {
       const response = await getAllCases(userData.token);
       setCases(response.data);
       setFilteredCases(response.data);
+      setFlag(true);
     };
-    getCases();
-  }, []);
+    console.log(flag);
+    if (!flag) {
+      getCases();
+    }
+  }, [flag]);
 
   //Headers de la tabla
   const headers = [
@@ -121,9 +127,7 @@ export const Cases = () => {
           <button
             type="button"
             className="btn btn-danger"
-            onClick={() => {
-              console.log("Delete");
-            }}
+            onClick={()=>handleSeeDelete(row.id)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -214,7 +218,7 @@ export const Cases = () => {
 
   //Get the client by id
   const getClientsById = async (id) => {
-    const response = await getClientById(id);
+    const response = await getClientById(id,userData.token);
     setCaseData({
       ...caseData,
       client: response.data,
@@ -229,7 +233,7 @@ export const Cases = () => {
 
   //Get the tech by id
   const getTechById = async (id) => {
-    const response = await getUserById(id);
+    const response = await getUserById(id,userData.token);
     setCaseData({
       ...caseData,
       user: response.data,
@@ -275,7 +279,6 @@ export const Cases = () => {
 
   //Edit Modal Functions
   const editCase = async (id) => {
-    
       const editedCase = {
         description: caseData.description,
         status: caseData.status,
@@ -286,17 +289,34 @@ export const Cases = () => {
       };
       try {
       const response = await editCaseCall(id, editedCase, userData.token);
+      if (response.status === 200) {
+        alert("Case edited");
+        handleEditClose();
+        setFlag(false);
+      }
       
     }catch (error) {
       console.log(error);
     }
-    
-
-    
-
   }
   
-  
+  //Delete Modal Functions
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const handleDeleteClose = () => setShowDelete(false);
+  const handleSeeDelete = (id) => {
+    setDeleteId(id);
+    setShowDelete(true);
+  }
+  //Delete the case
+  const handleDelete = async () => {  
+    const response = await deleteCaseCall(deleteId,userData.token);
+    if (response.status === 200) {
+      alert("Case deleted");
+      handleDeleteClose();
+      setFlag(false);
+    }
+  };
 
 
   return (
@@ -325,80 +345,36 @@ export const Cases = () => {
           handleSeeDetailsClose={handleSeeDetailsClose}
         />
 
-        {/*Edit Modal*/}
-        <Modal
-          size="lg"
-          show={showEdit}
-          onHide={handleSeeEdit}
-          backdrop="static"
-          keyboard={false}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Case Details</Modal.Title>
-          </Modal.Header>
+        {/* Edit Modal */}
+
+        <EditCaseModal
+          caseData={caseData}
+          showEdit={showEdit}
+          handleEditClose={handleEditClose}
+          handleEditModal={handleEditModal}
+          clientFilter={clientFilter}
+          handlerClientChange={handlerClientChange}
+          filteredClients={filteredClients}
+          techFilter={techFilter}
+          handlerTechChange={handlerTechChange}
+          filteredTechs={filteredTechs}
+          editCase={editCase}
+        />
+
+        {/* Delete Modal */}
+        <Modal show={showDelete} onHide={handleDeleteClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Client</Modal.Title>
           <Modal.Body>
-            <div>
-              <h5>Case Info</h5>
-              <div>
-                <InputGroup>
-                  <InputGroup.Text>Description</InputGroup.Text>
-                  <Form.Control as="textarea" aria-label="With textarea" onChange={handleEditModal} name="description" value={caseData.description}/>
-                </InputGroup>
-              </div>
-              <p>Status</p>
-              <Form.Select aria-label="Status" onChange={handleEditModal} name="status">
-                <option>Open this select menu</option>
-                <option value="true">Completed</option>
-                <option value="false">Pending</option>
-              </Form.Select>
-
-              <h5>Client</h5>
-              <input type="text" onChange={clientFilter} name="name"/>
-              <select name="client.id" onChange={handlerClientChange}>
-                {filteredClients.map((client) => (
-                  <option value={client.id}>{client.name}</option>
-                ))}
-              </select>
-              
-
-            </div>
-            <div>
-              <h5>Client Info</h5>
-              <p>Name: {caseData.client?.name}</p>
-              <p>Address: {caseData.client?.address}</p>
-              <p>Phone: {caseData.client?.phone}</p>
-              <p>Email: {caseData.client?.email}</p>
-              <p>Contact:{caseData.client?.contactName}</p>
-            </div>
-            <div>
-              <h5>Tech info</h5>
-              <input type="text" onChange={techFilter} name="name"/>
-              <select name="user.id" onChange={handlerTechChange}>
-                {filteredTechs.map((tech) => (
-                  <option value={tech.id}>{tech.firstName} {tech.lastName}</option>
-                ))}
-              </select>
-              <p>Tech Name: {caseData.user?.firstName} {caseData.user?.lastName}</p>
-              
-              <p>Tech Email: {caseData.user?.email}</p>
-              <p>Tech Phone: {caseData.user?.phone}</p>
-            </div>
-            <div>
-            <h3>initialDate</h3>
-              <input type="date"  onChange={handleEditModal} name="initialDate" value={caseData.initialDate}/>
-            
-            <h3>finalDate</h3>
-              <input type="date"  onChange={handleEditModal} name="finalDate" value={caseData.finalDate}/>
-            </div>
-            
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleEditClose}>
-              Close
+            <p>Are you sure you want to delete this client?</p>
+            <Button variant="danger" onClick={handleDelete}>
+              Delete
             </Button>
-            <Button variant="primary" onClick={()=>{editCase(caseData.id)}}>Edit Case</Button>
-          </Modal.Footer>
-        </Modal>
+          </Modal.Body>
+        </Modal.Header>
+      </Modal>
+
+        
       </div>
     </div>
   );

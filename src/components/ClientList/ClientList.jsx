@@ -11,37 +11,38 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useSelector } from "react-redux";
 import { getUserData } from "../Slicers/userSlicer";
+import { set } from "date-fns";
 
 export const ClientList = () => {
 
   //Use selector to get the user data
   const userData = useSelector(getUserData);
 
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState([0,0]);
   const [clientData, setClientData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingMe, setIsEditingMe] = useState("");
-
-  //use effect to call the clients
-  useEffect(() => {
-    const callClients = async () => {
-      try {
-        const response = await getAllClientsCall(userData.token);
-        if (response.status === 200) {
-          setClients(response.data);
-          setFilteredClients(response.data);
-          
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    callClients();
-    
-  }, []);
-
   //const for the filtered clients
-  const [filteredClients, setFilteredClients] = useState(clients);
+  const [filteredClients, setFilteredClients] = useState([]);
+  //use effect to call the clients
+  const [flag, setFlag] = useState(false);
+  useEffect(() => {
+    
+    const callClients = async () => {      
+        const response = await getAllClientsCall(userData.token);       
+          setClients(response.data);
+          setFilteredClients(response.data);   
+          setFlag(true);       
+    };
+    console.log(flag);
+    if(!flag){
+      callClients();
+    }
+    
+    
+  }, [flag]);
+
+  
 
   // Function to filter the clients
   const handleChange = (e) => {
@@ -78,6 +79,7 @@ export const ClientList = () => {
     if (response.status === 200) {
       console.log("Client edited");
       handleClose();
+      setFlag(false);
     }
   };
 
@@ -93,8 +95,9 @@ export const ClientList = () => {
   const deleteHandler = async () => {
     const response = await deleteClientCall(deleteId, userData.token);
     if (response.status === 200) {
-      console.log("Client deleted");
+      alert("Client deleted");
       handleCloseDelete(response.data.id);
+      setFlag(false);
     }
   };
 

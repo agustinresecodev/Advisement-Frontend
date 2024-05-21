@@ -46,3 +46,33 @@ export const editCaseCall = async (id, caseData, token) => {
         return error.response;
     }
 }
+
+//delete case by id
+export const deleteCaseCall = async (id, token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.delete(`http://localhost:3000/api/cases/${id}`, config);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+//create case
+export const createCaseCall = async (caseData, token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.post("http://localhost:3000/api/cases", caseData, config);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
