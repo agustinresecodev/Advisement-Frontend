@@ -6,7 +6,7 @@ import { Cases } from "../Cases/Cases"
 import { Clients } from "../Clients/Clients"
 import { CreateClient } from "../CreateClient/CreateClient"
 import { Profile } from "../Profile/Profile"
-
+import { AuthRoutes } from "../../components/AuthRoutes/AuthRoutes"
 
 
 export const Body = () => {
@@ -15,7 +15,7 @@ export const Body = () => {
         <Route path="/" element={<Home />} />
         <Route path="/auth/login" element={<Login/>}/>
         <Route path="/auth/register" element={<Register/>}/>
-        <Route path="/cases" element={<Cases />} />
+        <Route path="/cases" element={<AuthRoutes Children={Cases} />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/clients/create" element={<CreateClient />} />
         <Route path="/profile" element={<Profile/>}/>

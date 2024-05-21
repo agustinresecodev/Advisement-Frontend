@@ -4,9 +4,15 @@ import axios from "axios";
 const baseURL = "http://localhost:3000/api/";
 
 //GET ALL CLIENTS
-export const getAllClientsCall = async () => {
+export const getAllClientsCall = async (token) => {
     try {
-        const response = await axios.get(`${baseURL}clients`);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        const response = await axios.get(`${baseURL}clients`, config);
         return response;
     } catch (error) {
         return error.response;
@@ -14,36 +20,59 @@ export const getAllClientsCall = async () => {
 }
 
 //GET CLIENT BY ID
-export const getClientById = async (id) => {
+export const getClientById = async (id,token) => {
     try {
-        const response = await axios.get(`${baseURL}clients/${id}`);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        const response = await axios.get(`${baseURL}clients/${id}`, config);
         return response;
     } catch (error) {
         return error.response;
     }
 }
 
-export const editClientCall = async (id, data) => {
+export const editClientCall = async (id, data,token) => {
     try {
-        const response = await axios.put(`${baseURL}clients/${id}`, data);
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        const response = await axios.put(`${baseURL}clients/${id}`, data, config);
         return response;
     } catch (error) {
         return error.response;
     }
 }
 
-export const deleteClientCall = async (id) => {
+export const deleteClientCall = async (id,token) => {
     try {
-        const response = await axios.delete(`${baseURL}clients/${id}`);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.delete(`${baseURL}clients/${id}`, config);
         return response;
     } catch (error) {
         return error.response;
     }
 }
 
-export const createClientCall = async (data) => {
+export const createClientCall = async (data,token) => {
     try {
-        const response = await axios.post(`${baseURL}clients`, data);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.post(`${baseURL}clients`, data, config);
         return response;
     } catch (error) {
         return error.response;

@@ -9,8 +9,14 @@ import Form from "react-bootstrap/Form";
 import DataTable from "react-data-table-component";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { useSelector } from "react-redux";
+import { getUserData } from "../Slicers/userSlicer";
 
 export const ClientList = () => {
+
+  //Use selector to get the user data
+  const userData = useSelector(getUserData);
+
   const [clients, setClients] = useState([]);
   const [clientData, setClientData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
@@ -20,7 +26,7 @@ export const ClientList = () => {
   useEffect(() => {
     const callClients = async () => {
       try {
-        const response = await getAllClientsCall();
+        const response = await getAllClientsCall(userData.token);
         if (response.status === 200) {
           setClients(response.data);
           setFilteredClients(response.data);
@@ -48,7 +54,7 @@ export const ClientList = () => {
   //Function to edit a client
   const editClient = async (id) => {
     console.log(id);
-    const selectedClient = await getClientById(id);
+    const selectedClient = await getClientById(id, userData.token);
 
     setClientData(selectedClient.data);
     setShow(true);
@@ -85,7 +91,7 @@ export const ClientList = () => {
   };
 
   const deleteHandler = async () => {
-    const response = await deleteClientCall(deleteId);
+    const response = await deleteClientCall(deleteId, userData.token);
     if (response.status === 200) {
       console.log("Client deleted");
       handleCloseDelete(response.data.id);

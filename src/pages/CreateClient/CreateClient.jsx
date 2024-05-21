@@ -2,9 +2,12 @@ import Form from "react-bootstrap/Form";
 import { useState } from "react";
 import Button from "react-bootstrap/esm/Button";
 import { createClientCall } from "../../services/clientsCall";
+import { useSelector } from "react-redux";
+import { getUserData } from "../../components/Slicers/userSlicer";
 
 export const CreateClient = () => {
-    //
+    //read user data from the store
+    const userData = useSelector(getUserData);
     const [clientData, setClientData] = useState({});
 
     const handleModal = (e) => {
@@ -12,11 +15,15 @@ export const CreateClient = () => {
             ...clientData,
             [e.target.name]: e.target.value,
         });
-        console.log(clientData);
+       
     }
 
     const createClient = async () => {
-        const response = await createClientCall(clientData);
+      if (!clientData.name || !clientData.address || !clientData.phone || !clientData.email || !clientData.cif || !clientData.contactName) {
+          alert("Please fill all the fields");
+          return;
+      }
+        const response = await createClientCall(clientData,userData.token);
         if (response.status === 201) {
             alert("Client created successfully");
         } else {

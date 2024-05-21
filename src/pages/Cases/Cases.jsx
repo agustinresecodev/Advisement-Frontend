@@ -11,15 +11,22 @@ import dayjs from "dayjs";
 import { DayPicker } from "react-day-picker";
 import { set } from "date-fns";
 import { getAllTechs, getUserById } from "../../services/usersCall";
+import { getUserData } from "../../components/Slicers/userSlicer";
+import { useSelector } from "react-redux";
+
+
 
 
 export const Cases = () => {
+  //read the token from the store
+ const userData = useSelector(getUserData);
+
   const [cases, setCases] = useState([]);
   const [filteredCases, setFilteredCases] = useState([]);
 
   useEffect(() => {
     const getCases = async () => {
-      const response = await getAllCases();
+      const response = await getAllCases(userData.token);
       setCases(response.data);
       setFilteredCases(response.data);
     };
@@ -155,7 +162,7 @@ export const Cases = () => {
   const handleSeeDetailsClose = () => setShowDetails(false);
   const handleSeeDetailsShow = () => setShowDetails(true);
   const handleSeeDetails = async (id) => {
-    const response = await getCaseById(id);
+    const response = await getCaseById(id,userData.token);
     setCaseData(response.data);
     handleSeeDetailsShow();
   };
@@ -165,7 +172,7 @@ export const Cases = () => {
   const handleEditClose = () => setShowEdit(false);
   const handleEditShow = () => setShowEdit(true);
   const handleSeeEdit = async (id) => {
-    const response = await getCaseById(id);
+    const response = await getCaseById(id,userData.token);
     setCaseData(response.data);
     handleEditShow();
     getClients();
@@ -176,7 +183,7 @@ export const Cases = () => {
       ...caseData,
       [e.target.name]: e.target.value,
     });
-    console.log(caseData);
+    
   };
 
   //Get Clients
@@ -184,7 +191,7 @@ export const Cases = () => {
   const [filteredClients, setFilteredClients] = useState([]);
   //Get all clients for the select
   const getClients = async () => {
-    const response = await getAllClientsCall();
+    const response = await getAllClientsCall(userData.token);
     setClients(response.data);
     setFilteredClients(response.data);
   }
@@ -263,7 +270,7 @@ export const Cases = () => {
 
   //Get all techs for the select
   const getTechs = async () => {
-    const response = await getAllTechs();
+    const response = await getAllTechs(userData.token);
     setTechs(response.data);
     setFilteredTechs(response.data);
     console.log(response.data);
@@ -281,7 +288,7 @@ export const Cases = () => {
         userId: caseData.user.id,
       };
       try {
-      const response = await editCaseCall(id, editedCase);
+      const response = await editCaseCall(id, editedCase, userData.token);
       console.log(response);
     }catch (error) {
       console.log(error);

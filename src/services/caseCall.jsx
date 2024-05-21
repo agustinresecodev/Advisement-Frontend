@@ -1,9 +1,14 @@
 import axios from "axios";
 
 //Get all cases
-export const getAllCases = async () => {
+export const getAllCases = async (token) => {
     try {
-        const response = await axios.get("http://localhost:3000/api/cases");
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.get("http://localhost:3000/api/cases", config);
         return response;
     } catch (error) {
         return error.response;
@@ -12,9 +17,15 @@ export const getAllCases = async () => {
 
 //Get case by id
 
-export const getCaseById = async (id) => {
+export const getCaseById = async (id,token) => {
     try {
-        const response = await axios.get(`http://localhost:3000/api/cases/${id}`);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        const response = await axios.get(`http://localhost:3000/api/cases/${id}`, config);
         return response;
     } catch (error) {
         return error.response;

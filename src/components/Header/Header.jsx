@@ -4,7 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useSelector } from "react-redux"
 import { getUserData, logout } from "../../components/Slicers/userSlicer";
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 export const Header = () => {
 
@@ -17,7 +17,9 @@ export const Header = () => {
   //logout function
   const logoutUser = () => {
     dispatch(logout())
-    navigate("/");
+    return(
+      <Navigate to="/login"/>
+    )
   }
 
 
