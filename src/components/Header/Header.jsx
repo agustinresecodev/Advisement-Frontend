@@ -12,7 +12,7 @@ export const Header = () => {
   const navigate = useNavigate();
   //read the user data from the store
   const userData = useSelector(getUserData);
-  console.log(userData);
+
 
   //logout function
   const logoutUser = () => {
@@ -24,7 +24,7 @@ export const Header = () => {
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="#home">AdviseMe</Navbar.Brand>
+        <Navbar.Brand href="/">AdviseMe</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
@@ -48,9 +48,10 @@ export const Header = () => {
                   <NavDropdown.Item href="/cases">
                     See all Cases
                   </NavDropdown.Item>
-                  <NavDropdown.Item href="#action/3.1">
+                  {userData.decodificado.userRole === "admin" ||"administration" ? (<NavDropdown.Item href="/cases/create">
                     Create new Case
-                  </NavDropdown.Item>
+                  </NavDropdown.Item>) : null}
+                  
                 </NavDropdown>
 
                 <NavDropdown

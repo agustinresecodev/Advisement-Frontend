@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllCases, getCaseById,editCaseCall, deleteCaseCall } from "../../services/caseCall";
+import { getAllCases, getCaseById,editCaseCall, deleteCaseCall, getCaseByUserId } from "../../services/caseCall";
 import { getAllClientsCall, getClientById } from "../../services/clientsCall";
 import DataTable from "react-data-table-component";
 import Button from "react-bootstrap/Button";
@@ -17,20 +17,37 @@ import { EditCaseModal } from "../../components/EditCaseModal/EditCaseModal";
 
 export const Cases = () => {
   //read the token from the store
- const userData = useSelector(getUserData);
+  const userData = useSelector(getUserData);
+  const userRole = userData.decodificado.userRole;
+  
 
   const [cases, setCases] = useState([]);
   const [filteredCases, setFilteredCases] = useState([]);
   const [flag, setFlag] = useState(false);
 
+  //Get all cases if you are admin or administration or your cases if you are a technician
   useEffect(() => {
     const getCases = async () => {
-      const response = await getAllCases(userData.token);
-      setCases(response.data);
-      setFilteredCases(response.data);
-      setFlag(true);
+      if(userRole === "admin"|| userRole === "administration"){
+        const response = await getAllCases(userData.token);
+        setCases(response.data);
+        setFilteredCases(response.data);
+        setFlag(true);
+      }
+
+      if(userRole === "technicians"){
+        console.log("entro")
+        const response = await getCaseByUserId(userData.token);
+        setCases(response.data);
+        setFilteredCases(response.data);
+        setFlag(true);
+        console.log(response.data);
+        
+      }
+      
+      
     };
-    console.log(flag);
+    
     if (!flag) {
       getCases();
     }
@@ -123,7 +140,7 @@ export const Cases = () => {
               />
             </svg>
           </button>
-
+          {userRole === "admin"|| userRole === "administration" ? (
           <button
             type="button"
             className="btn btn-danger"
@@ -143,7 +160,8 @@ export const Cases = () => {
               />
               <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
             </svg>
-          </button>
+          </button>) : null}
+          
         </>
       ),
     },
@@ -183,6 +201,7 @@ export const Cases = () => {
     setCaseData({
       ...caseData,
       [e.target.name]: e.target.value,
+      
     });
     
   };
