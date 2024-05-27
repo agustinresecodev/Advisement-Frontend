@@ -123,7 +123,8 @@ const caseDataHandler = (e) => {
             <input type="text" placeholder="Tech Filter" onChange={filterTechs}/>
             <select name="userId" onChange={caseDataHandler}>
                 {filteredTechs.map((tech) => {
-                    return <option name="tech" key={tech.id} value={tech.id}>{tech.firstName} {tech.lastName}</option>
+                    
+                    return <option name="userId" value={tech.id} key={tech.id} >{tech.firstName} {tech.lastName}</option>
                 })}
             </select>
             </div>
