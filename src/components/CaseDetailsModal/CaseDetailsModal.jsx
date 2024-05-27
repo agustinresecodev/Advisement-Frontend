@@ -34,7 +34,7 @@ return (
             <div>
                 <h5>Tech info</h5>
                 <p>
-                    Tech Name: {caseData.user?.name}
+                    Tech Name: {caseData.user?.firstName} {caseData.user?.lastName}
                 </p>
                 <p>
                     Tech Email: {caseData.user?.email}

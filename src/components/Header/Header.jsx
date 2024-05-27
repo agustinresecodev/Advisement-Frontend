@@ -13,7 +13,7 @@ export const Header = () => {
   //read the user data from the store
   const userData = useSelector(getUserData);
 
-
+  console.log(userData)
   //logout function
   const logoutUser = () => {
     
@@ -36,7 +36,8 @@ export const Header = () => {
               </>
             ) : (
               <>
-                <NavDropdown title="Clients" id="basic-nav-dropdown">
+                {userData.decodificado.userRole === "admin" | "administration" ? (
+                  <NavDropdown title="Clients" id="basic-nav-dropdown">
                   <NavDropdown.Item href="/clients">
                     See all Clients
                   </NavDropdown.Item>
@@ -44,11 +45,14 @@ export const Header = () => {
                     Create New Client
                   </NavDropdown.Item>
                 </NavDropdown>
+                ) : (null)
+                }
+                
                 <NavDropdown title="Cases" id="basic-nav-dropdown">
                   <NavDropdown.Item href="/cases">
                     See all Cases
                   </NavDropdown.Item>
-                  {userData.decodificado.userRole === "admin" ||"administration" ? (<NavDropdown.Item href="/cases/create">
+                  {userData.decodificado.userRole === "admin" |"administration" ? (<NavDropdown.Item href="/cases/create">
                     Create new Case
                   </NavDropdown.Item>) : null}
                   
