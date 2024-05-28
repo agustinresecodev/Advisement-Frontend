@@ -5,6 +5,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData, logout } from "../../components/Slicers/userSlicer";
 import { Navigate, useNavigate } from "react-router-dom";
+import  logo from "../../assets/img/logo.png";
 import "./Header.css";
 export const Header = () => {
   //navigate function
@@ -23,7 +24,7 @@ export const Header = () => {
   return (
     <Navbar expand="lg" id="navigation-bar">
       <Container>
-        <Navbar.Brand href="/">AdviseMe</Navbar.Brand>
+        <Navbar.Brand href="/"><img src={logo} className="logo"/></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">

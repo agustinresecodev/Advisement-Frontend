@@ -348,7 +348,7 @@ export const Cases = () => {
       <div>
         <h1>Cases</h1>
         <DataTable
-          title="Cases"
+          
           columns={headers}
           data={filteredCases}
           pagination
