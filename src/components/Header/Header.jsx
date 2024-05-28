@@ -5,7 +5,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData, logout } from "../../components/Slicers/userSlicer";
 import { Navigate, useNavigate } from "react-router-dom";
-
+import "./Header.css";
 export const Header = () => {
   //navigate function
   const dispatch = useDispatch();
@@ -13,16 +13,15 @@ export const Header = () => {
   //read the user data from the store
   const userData = useSelector(getUserData);
 
-  console.log(userData)
+  console.log(userData);
   //logout function
   const logoutUser = () => {
-    
     dispatch(logout());
     navigate("/");
   };
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
+    <Navbar expand="lg" id="navigation-bar">
       <Container>
         <Navbar.Brand href="/">AdviseMe</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -31,31 +30,37 @@ export const Header = () => {
             <Nav.Link href="/">Home</Nav.Link>
             {userData.token === "" ? (
               <>
-                <Nav.Link href="/auth/login">LogIn</Nav.Link>
-                <Nav.Link href="/auth/register">Register</Nav.Link>
+                <Nav.Link className="link" href="/auth/login">
+                  LogIn
+                </Nav.Link>
+                <Nav.Link className="link" href="/auth/register">
+                  Register
+                </Nav.Link>
               </>
             ) : (
               <>
-                {userData.decodificado.userRole === "admin" | "administration" ? (
+                {(userData.decodificado.userRole === "admin") |
+                "administration" ? (
                   <NavDropdown title="Clients" id="basic-nav-dropdown">
-                  <NavDropdown.Item href="/clients">
-                    See all Clients
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/clients/create">
-                    Create New Client
-                  </NavDropdown.Item>
-                </NavDropdown>
-                ) : (null)
-                }
-                
+                    <NavDropdown.Item className="link" href="/clients">
+                      See all Clients
+                    </NavDropdown.Item>
+                    <NavDropdown.Item className="link" href="/clients/create">
+                      Create New Client
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                ) : null}
+
                 <NavDropdown title="Cases" id="basic-nav-dropdown">
-                  <NavDropdown.Item href="/cases">
+                  <NavDropdown.Item className="link" href="/cases">
                     See all Cases
                   </NavDropdown.Item>
-                  {userData.decodificado.userRole === "admin" |"administration" ? (<NavDropdown.Item href="/cases/create">
-                    Create new Case
-                  </NavDropdown.Item>) : null}
-                  
+                  {(userData.decodificado.userRole === "admin") |
+                  "administration" ? (
+                    <NavDropdown.Item className="link" href="/cases/create">
+                      Create new Case
+                    </NavDropdown.Item>
+                  ) : null}
                 </NavDropdown>
 
                 <NavDropdown
@@ -67,6 +72,19 @@ export const Header = () => {
                     Log Out
                   </NavDropdown.Item>
                 </NavDropdown>
+                {userData.decodificado.userRole === "admin" ? (
+                  <>
+                    <NavDropdown
+                      title="Admin Panel"
+                      id="basic-nav-dropdown"
+                    >
+                      <NavDropdown.Item href="/admin">
+                        Admin profile
+                      </NavDropdown.Item>
+                      
+                    </NavDropdown>
+                  </>
+                ) : null}
               </>
             )}
           </Nav>

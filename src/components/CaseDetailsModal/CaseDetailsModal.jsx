@@ -1,5 +1,6 @@
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import dayjs from "dayjs";
 
 
 export const CaseDetailsModal = ({ caseData, showDetails,handleSeeDetailsClose }) => {
@@ -18,13 +19,13 @@ return (
           </Modal.Header>
           <Modal.Body>
             <div>
-              <h5>Case Info</h5>
+              <h5 className="d-flex justify-content-center">Case Info</h5>
               <p>Description: {caseData.description}</p>
               <p>Status: {caseData.status === true ? "Resolved" : "Pending"}</p>
-              <p>Creation Date: {caseData.createdAt}</p>
+              <p>Creation Date: {dayjs(caseData.createdAt).format('YYYY/MM/DD')}</p>
             </div>
             <div>
-              <h5>Client Info</h5>
+              <h5 className="d-flex justify-content-center">Client Info</h5>
               <p>Name: {caseData.client?.name}</p>
               <p>Address: {caseData.client?.address}</p>
               <p>Phone: {caseData.client?.phone}</p>
@@ -32,7 +33,7 @@ return (
               <p>Contact:{caseData.client?.contactName}</p>
             </div>
             <div>
-                <h5>Tech info</h5>
+                <h5 className="d-flex justify-content-center">Tech info</h5>
                 <p>
                     Tech Name: {caseData.user?.firstName} {caseData.user?.lastName}
                 </p>

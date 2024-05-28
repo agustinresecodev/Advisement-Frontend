@@ -91,7 +91,7 @@ export const Cases = () => {
     {
       name: "Creation Date",
       label: "Creation Date",
-      selector: (row) => row.createdAt,
+      selector: (row) => dayjs(row.createdAt).format("YYYY/MM/DD"),
       sortable: true,
     },
     {

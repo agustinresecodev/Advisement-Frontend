@@ -66,3 +66,33 @@ export const getAllTechs = async (token) => {
         return error.response;
     }
 }
+
+//get all users
+export const getAllUsers = async (token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.get(`${baseURL}users`, config);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+//delete user
+export const deleteUser = async (id, token) => {
+    try {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const response = await axios.delete(`${baseURL}users/${id}`, config);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
