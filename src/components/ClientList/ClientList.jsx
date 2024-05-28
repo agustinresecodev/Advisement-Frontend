@@ -9,33 +9,40 @@ import Form from "react-bootstrap/Form";
 import DataTable from "react-data-table-component";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { useSelector } from "react-redux";
+import { getUserData } from "../Slicers/userSlicer";
+import { set } from "date-fns";
 
 export const ClientList = () => {
-  const [clients, setClients] = useState([]);
+
+  //Use selector to get the user data
+  const userData = useSelector(getUserData);
+
+  const [clients, setClients] = useState([0,0]);
   const [clientData, setClientData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingMe, setIsEditingMe] = useState("");
-
-  //use effect to call the clients
-  useEffect(() => {
-    const callClients = async () => {
-      try {
-        const response = await getAllClientsCall();
-        if (response.status === 200) {
-          setClients(response.data);
-          setFilteredClients(response.data);
-          console.log(response.data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    callClients();
-    console.log(clients);
-  }, []);
-
   //const for the filtered clients
-  const [filteredClients, setFilteredClients] = useState(clients);
+  const [filteredClients, setFilteredClients] = useState([]);
+  //use effect to call the clients
+  const [flag, setFlag] = useState(false);
+  useEffect(() => {
+    
+    const callClients = async () => {      
+        const response = await getAllClientsCall(userData.token);       
+          setClients(response.data);
+          setFilteredClients(response.data);   
+          setFlag(true);       
+    };
+    console.log(flag);
+    if(!flag){
+      callClients();
+    }
+    
+    
+  }, [flag]);
+
+  
 
   // Function to filter the clients
   const handleChange = (e) => {
@@ -48,7 +55,7 @@ export const ClientList = () => {
   //Function to edit a client
   const editClient = async (id) => {
     console.log(id);
-    const selectedClient = await getClientById(id);
+    const selectedClient = await getClientById(id, userData.token);
 
     setClientData(selectedClient.data);
     setShow(true);
@@ -72,6 +79,7 @@ export const ClientList = () => {
     if (response.status === 200) {
       console.log("Client edited");
       handleClose();
+      setFlag(false);
     }
   };
 
@@ -85,10 +93,11 @@ export const ClientList = () => {
   };
 
   const deleteHandler = async () => {
-    const response = await deleteClientCall(deleteId);
+    const response = await deleteClientCall(deleteId, userData.token);
     if (response.status === 200) {
-      console.log("Client deleted");
+      alert("Client deleted");
       handleCloseDelete(response.data.id);
+      setFlag(false);
     }
   };
 
@@ -142,13 +151,13 @@ export const ClientList = () => {
               xmlns="http://www.w3.org/2000/svg"
               width="16"
               height="16"
-              fill="currentColor"
+              fillRule="currentColor"
               className="bi bi-pencil-square"
               viewBox="0 0 16 16"
             >
               <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
               />
             </svg>
@@ -163,12 +172,12 @@ export const ClientList = () => {
               xmlns="http://www.w3.org/2000/svg"
               width="16"
               height="16"
-              fill="currentColor"
+              fillRule="currentColor"
               className="bi bi-person-dash-fill"
               viewBox="0 0 16 16"
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"
               />
               <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
@@ -251,7 +260,7 @@ export const ClientList = () => {
               <Form.Label>Contact Person</Form.Label>
               <Form.Control
                 type="text"
-                name="contact"
+                name="contactName"
                 value={clientData.contactName}
                 placeholder="Contact Person"
                 onChange={handleModal}
