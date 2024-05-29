@@ -39,9 +39,11 @@ export const LoginForm = () => {
         
         const answer = await loginUserCall(userCredentials);
         
-        if (answer.data.message) {
+        
+        if (answer.status === 400) {
           setLoginError("Wrong Credentials");
-        } else
+          return
+        }
         if (answer.data.token) {
           
           //decodificamos el token...

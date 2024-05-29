@@ -52,4 +52,11 @@ export const validateZip = (zip) => {
     return '';
 }
 
+export const validateCif = (cif) => {
+    if (!cif) {
+        return 'CIF is required';
+    }
+    return true;
+}
+
 
