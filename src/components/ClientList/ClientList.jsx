@@ -12,13 +12,19 @@ import Modal from "react-bootstrap/Modal";
 import { useSelector } from "react-redux";
 import { getUserData } from "../Slicers/userSlicer";
 import { set } from "date-fns";
+import {
+  validateAddress,
+  validateCif,
+  validateEmail,
+  validateName,
+  validatePhone,
+} from "../../helpers/validators";
 
 export const ClientList = () => {
-
   //Use selector to get the user data
   const userData = useSelector(getUserData);
 
-  const [clients, setClients] = useState([0,0]);
+  const [clients, setClients] = useState([0, 0]);
   const [clientData, setClientData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingMe, setIsEditingMe] = useState("");
@@ -26,23 +32,27 @@ export const ClientList = () => {
   const [filteredClients, setFilteredClients] = useState([]);
   //use effect to call the clients
   const [flag, setFlag] = useState(false);
+
+  //errors const
+  const [nameError, setNameError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [cifError, setCifError] = useState("");
+  const [contactNameError, setContactNameError] = useState("");
+
   useEffect(() => {
-    
-    const callClients = async () => {      
-        const response = await getAllClientsCall(userData.token);       
-          setClients(response.data);
-          setFilteredClients(response.data);   
-          setFlag(true);       
+    const callClients = async () => {
+      const response = await getAllClientsCall(userData.token);
+      setClients(response.data);
+      setFilteredClients(response.data);
+      setFlag(true);
     };
     console.log(flag);
-    if(!flag){
+    if (!flag) {
       callClients();
     }
-    
-    
   }, [flag]);
-
-  
 
   // Function to filter the clients
   const handleChange = (e) => {
@@ -75,11 +85,27 @@ export const ClientList = () => {
   };
 
   const editHandler = async () => {
-    const response = await editClientCall(clientData.id, clientData);
-    if (response.status === 200) {
-      console.log("Client edited");
-      handleClose();
-      setFlag(false);
+    if (
+      validateName(clientData.name) === true && 
+      validateAddress(clientData.address) === true &&
+      validatePhone(clientData.phone) === true &&
+      validateEmail(clientData.email) === true &&
+      validateCif(clientData.cif) === true &&
+      validateName(clientData.contactName) === true
+    ) {
+      const response = await editClientCall(clientData.id, clientData, userData.token);
+      if (response.status === 200) {
+        alert("Client edited");
+        handleClose();
+        setFlag(false);
+      }
+    }else{
+      setNameError(validateName(clientData.name) === true ? "" : validateName(clientData.name));
+      setAddressError(validateAddress(clientData.address) === true ? "" : validateAddress(clientData.address));
+      setPhoneError(validatePhone(clientData.phone) === true ? "" : validatePhone(clientData.phone));
+      setEmailError(validateEmail(clientData.email) === true ? "" : validateEmail(clientData.email));
+      setCifError(validateCif(clientData.cif) === true ? "" : validateCif(clientData.cif));
+      setContactNameError(validateName(clientData.contactName) === true ? "" : validateName(clientData.contactName));
     }
   };
 
@@ -215,6 +241,7 @@ export const ClientList = () => {
                 placeholder="Name"
                 onChange={handleModal}
               />
+              <p className="error">{nameError}</p>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Address</Form.Label>
@@ -225,6 +252,7 @@ export const ClientList = () => {
                 placeholder="Address"
                 onChange={handleModal}
               />
+              <p className="error">{addressError}</p>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Phone</Form.Label>
@@ -235,6 +263,7 @@ export const ClientList = () => {
                 placeholder="Phone"
                 onChange={handleModal}
               />
+              <p className="error">{phoneError}</p>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
@@ -245,6 +274,7 @@ export const ClientList = () => {
                 placeholder="Email"
                 onChange={handleModal}
               />
+              <p className="error">{emailError}</p>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>CIF</Form.Label>
@@ -255,6 +285,7 @@ export const ClientList = () => {
                 placeholder="CIF"
                 onChange={handleModal}
               />
+              <p className="error">{cifError}</p>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Contact Person</Form.Label>
@@ -265,6 +296,7 @@ export const ClientList = () => {
                 placeholder="Contact Person"
                 onChange={handleModal}
               />
+              <p className="error">{contactNameError}</p>
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -283,7 +315,12 @@ export const ClientList = () => {
           <Modal.Title>Delete Client</Modal.Title>
           <Modal.Body>
             <p>Are you sure you want to delete this client?</p>
-            <Button variant="danger" onClick={()=>{deleteHandler(deleteId)}}>
+            <Button
+              variant="danger"
+              onClick={() => {
+                deleteHandler(deleteId);
+              }}
+            >
               Delete
             </Button>
           </Modal.Body>

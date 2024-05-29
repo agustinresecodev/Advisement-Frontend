@@ -38,15 +38,21 @@ export const getClientById = async (id,token) => {
 export const editClientCall = async (id, data,token) => {
     try {
 
+        //config for the headers
         const config = {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         };
 
+        //call to the api
         const response = await axios.put(`${baseURL}clients/${id}`, data, config);
+        
+        //return the response
         return response;
+
     } catch (error) {
+        
         return error.response;
     }
 }
