@@ -14,7 +14,7 @@ export const Header = () => {
   //read the user data from the store
   const userData = useSelector(getUserData);
 
-  console.log(userData);
+
   //logout function
   const logoutUser = () => {
     dispatch(logout());

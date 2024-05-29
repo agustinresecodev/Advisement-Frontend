@@ -1,5 +1,5 @@
 import { Modal,Button } from "react-bootstrap";
-import { deleteUser } from "../../services/usersCall";
+
 
 export const DeleteUserModal = ({handleSeeDeleteClose,showDelete,handlerDeleteUser}) => {
 
